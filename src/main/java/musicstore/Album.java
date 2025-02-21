@@ -1,6 +1,7 @@
 package musicstore;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents an Album using its title, artist, genre, year, and list of songs
@@ -11,12 +12,12 @@ public class Album {
     private final String genre;
     private final int year;
 
-    private final ArrayList<Song> songs;
+    private final List<Song> songs;
 
     /**
      * @pre title != null && artist != null && genre != null && year != null && songs != null
      */
-    public Album(String title, String artist, String genre, int year, ArrayList<Song> songs) {
+    public Album(String title, String artist, String genre, int year, List<Song> songs) {
         this.title = title;
         this.artist = artist;
         this.genre = genre;
