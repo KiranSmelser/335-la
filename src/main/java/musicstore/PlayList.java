@@ -17,6 +17,14 @@ public class PlayList {
 		return name;
 	}
 	
+	public void addSong(Song song) {
+		songs.add(song);
+	}
+	
+	public void removeSong(Song song) {
+		songs.remove(song);
+	}
+	
     public List<Song> getSongs() {
         return Collections.unmodifiableList(songs);
     }
