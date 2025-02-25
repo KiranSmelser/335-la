@@ -1,4 +1,4 @@
-package musicstore;
+package model;
 
 import java.util.ArrayList;
 import java.util.Collections;

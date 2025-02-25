@@ -1,8 +1,11 @@
-package musicstore;
+package model;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
+
+import model.Album;
+import model.Song;
 
 import java.util.ArrayList;
 import java.util.Arrays;

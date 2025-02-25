@@ -1,8 +1,10 @@
-package musicstore;
+package model;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
+
+import model.Song;
 
 /**
  * JUnit tests for Song class

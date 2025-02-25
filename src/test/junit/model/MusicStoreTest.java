@@ -1,7 +1,11 @@
-package musicstore;
+package model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import model.Album;
+import model.MusicStore;
+import model.Song;
 
 import java.io.IOException;
 import java.util.List;

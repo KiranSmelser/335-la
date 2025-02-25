@@ -1,4 +1,4 @@
-package musicstore;
+package model;
 
 /**
  * Represents a Song using its title, artist, and album
