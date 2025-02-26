@@ -41,7 +41,7 @@ public class Album {
         return year;
     }
 
-    public ArrayList<Song> getSongs() {
+    public List<Song> getSongs() {
         return new ArrayList<>(songs);	// copies ArrayList to prevent escaping reference
     }
 }
