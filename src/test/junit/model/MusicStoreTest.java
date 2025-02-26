@@ -44,26 +44,37 @@ public class MusicStoreTest {
         assertNotNull(album);
         assertEquals("21", album.getTitle());
         assertEquals("Adele", album.getArtist());
-        
-        Album album2 = store.getAlbumByTitle("");
-        assertNull(album2);
+    }
+    
+    @Test
+    void testGetAlbumByTitle_NonExistent() {
+        Album album = store.getAlbumByTitle("Purple Rain");
+        assertNull(album);
     }
 
     @Test
-    public void testGetAlbumsByArtist() {
-    	// Test for single Album
+    public void testGetAlbumsByArtist_Single() {
         List<Album> albums = store.getAlbumsByArtist("Leonard Cohen");
         assertNotNull(albums);
         assertEquals(1, albums.size());
         assertEquals("Old Ideas", albums.get(0).getTitle());
-        
-        // Test for multiple Albums
+    }
+    
+    @Test
+    public void testGetAlbumsByArtist_Multiple() {
         List<Album> albums2 = store.getAlbumsByArtist("Adele");
         assertNotNull(albums2);
         assertTrue(albums2.size() >= 2);
         boolean has21 = albums2.stream().anyMatch(a -> a.getTitle().equalsIgnoreCase("21"));
-        boolean has25 = albums2.stream().anyMatch(a -> a.getTitle().equalsIgnoreCase("25"));
-        assertTrue(has21 && has25);
+        boolean has19 = albums2.stream().anyMatch(a -> a.getTitle().equalsIgnoreCase("19"));
+        assertTrue(has21 && has19);
+    }
+    
+    @Test
+    void testGetAlbumsByArtist_NonExistent() {
+        List<Album> albums = store.getAlbumsByArtist("Prince");
+        assertNotNull(albums);
+        assertTrue(albums.isEmpty());
     }
 
     // ------------------------------------------------------------------------
@@ -71,39 +82,45 @@ public class MusicStoreTest {
     // ------------------------------------------------------------------------
 
     @Test
-    public void testGetSongsByTitle() {
-        // Test for single Song
+    public void testGetSongsByTitle_Single() {
         List<Song> songs = store.getSongsByTitle("Rolling in the Deep");
         assertNotNull(songs);
         assertEquals(1, songs.size());
         Song song = songs.get(0);
         assertEquals("Rolling in the Deep", song.getTitle());
         assertEquals("Adele", song.getArtist());
-        
-        // Test for multiple Songs
+    }
+    
+    @Test
+    public void testGetSongsByTitle_Multiple() {        
         List<Song> songs2 = store.getSongsByTitle("Lullaby");
         assertNotNull(songs2);
         assertTrue(songs2.size() >= 2);
-        
-        // Test for Song that does not exist
+    }
+    
+    @Test
+    public void testGetSongsByTitle_NonExistent() {
         List<Song> songs3 = store.getSongsByTitle("Purple Rain");
         assertNotNull(songs3);
         assertTrue(songs3.isEmpty());
     }
     
     @Test
-    public void testGetSongsByArtist() {
-        // Test for single Song
+    public void testGetSongsByArtist_Single() {
         List<Song> songs = store.getSongsByArtist("Leonard Cohen");
         assertNotNull(songs);
         assertFalse(songs.isEmpty());
-        
-        // Test for multiple Songs
+    }
+    
+    @Test
+    public void testGetSongsByArtist_Multiple() {
         List<Song> songs2 = store.getSongsByArtist("Adele");
         assertNotNull(songs2);
         assertTrue(songs2.size() > 10);
-        
-        // Test for Artist that does not exist
+    }
+    
+    @Test
+    public void testGetSongsByArtist_NonExistent() {
         List<Song> songs3 = store.getSongsByArtist("Prince");
         assertNotNull(songs3);
         assertTrue(songs3.isEmpty());

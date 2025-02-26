@@ -3,20 +3,33 @@ package model;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-
-import model.Album;
-import model.Song;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * JUnit tests for Album class
  */
 class AlbumTest {
-    private final Song song1 = new Song("Hold On", "Alabama Shakes", "Boys & Girls");
-    private final Song song2 = new Song("Hang Loose", "Alabama Shakes", "Boys & Girls");
-	private final Album album = new Album("Boys & Girls", "Alabama Shakes", "Alternative", 2012, new ArrayList<>(Arrays.asList(song1, song2)));
+	private Album album;
+    private Song song1;
+    private Song song2;
+    private List<Song> songList;
+
+    /**
+     * Constructs a new Album object before each test
+     */
+    @BeforeEach
+    void setUp() {
+        song1 = new Song("Hold On", "Alabama Shakes", "Boys & Girls");
+        song2 = new Song("Hang Loose", "Alabama Shakes", "Boys & Girls");
+
+        songList = new ArrayList<>(Arrays.asList(song1, song2));
+
+        album = new Album("Boys & Girls", "Alabama Shakes", "Alternative", 2012, songList);
+    }
 
     @Test
     public void testGetTitle() {
@@ -40,7 +53,7 @@ class AlbumTest {
 
     @Test
     public void testGetSongs() {
-        ArrayList<Song> songs = album.getSongs();
+        List<Song> songs = album.getSongs();
         assertEquals(2, songs.size());
         assertTrue(songs.contains(song1));
         assertTrue(songs.contains(song2));
