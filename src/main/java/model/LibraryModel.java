@@ -5,11 +5,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 
 public class LibraryModel {
 
 	private final List<Song> songs;
-	private final List<String> artists;
+	private final Set<String> artists;
 	private final List<Album> albums;
 	private final List<Song> favoriteSongs;
 	private final List<PlayList> playlists;
@@ -17,52 +19,93 @@ public class LibraryModel {
 
 	public LibraryModel() {
 		songs = new ArrayList<>();
-		artists = new ArrayList<>();
+		artists = new HashSet<>();
 		albums = new ArrayList<>();
 		favoriteSongs = new ArrayList<>();
 		playlists = new ArrayList<>();
 		ratedSongs = new HashMap<>();
 	}
-
+	
+	/**
+     * Adds a song to library if not already present
+     */
 	public void addSong(Song song) {
-		songs.add(song);
-		artists.add(song.getArtist());
+		if (!songs.contains(song)) {
+            songs.add(song);
+            artists.add(song.getArtist());
+        }
 	}
-
+	
+	/**
+     * Adds an album and all its songs to library if not already present
+     */
 	public void addAlbum(Album album) {
-		albums.add(album);
-		for (Song song : album.getSongs()) {
-			songs.add(song);
-		}
+		if (!albums.contains(album)) {
+            albums.add(album);
+        }
+        for (Song song : album.getSongs()) {
+            if (!songs.contains(song)) {
+                songs.add(song);
+                artists.add(song.getArtist());
+            }
+        }
 	}
 
-	public Song getSongByTitle(String title) {
-		for (Song song : songs) {
-			if (song.getTitle().equals(title)) return song;
-		}
-		return null;
-	}
+	/**
+     * Returns all Songs that match a given title
+     */
+    public List<Song> getSongsByTitle(String title) {
+        List<Song> results = new ArrayList<>();
+        for (Song song : songs) {
+            if (song.getTitle().equalsIgnoreCase(title)) {
+                results.add(song);
+            }
+        }
+        return results;
+    }
 
-	public Song getSongByArtist(String artist) {
-		for (Song song : songs) {
-			if (song.getArtist().equals(artist)) return song;
-		}
-		return null;
-	}
+    /**
+     * Returns all Songs by a given artist
+     */
+    public List<Song> getSongsByArtist(String artist) {
+        List<Song> results = new ArrayList<>();
+        for (Song song : songs) {
+            if (song.getArtist().equalsIgnoreCase(artist)) {
+                results.add(song);
+            }
+        }
+        return results;
+    }
 
-	public Album getAlbumByTitle(String title) {
-		for (Album album : albums) {
-			if (album.getTitle().equals(title)) return album;
-		}
-		return null;
-	}
+    /**
+     * Returns all Albums that match a given title
+     */
+    public List<Album> getAlbumsByTitle(String title) {
+        List<Album> results = new ArrayList<>();
+        for (Album album : albums) {
+            if (album.getTitle().equalsIgnoreCase(title)) {
+                results.add(album);
+            }
+        }
+        return results;
+    }
 
-	public Album getAlbumByArtist(String title) {
-		for (Album album : albums) {
-			if (album.getArtist().equals(title)) return album;
-		}
-		return null;
-	}
+    /**
+     * Returns all Albums by a given artist
+     */
+    public List<Album> getAlbumsByArtist(String artist) {
+        List<Album> results = new ArrayList<>();
+        for (Album album : albums) {
+            if (album.getArtist().equalsIgnoreCase(artist)) {
+                results.add(album);
+            }
+        }
+        return results;
+    }
+    
+    public List<Song> getSongs() {
+        return Collections.unmodifiableList(songs);
+    }
 	
 	public List<String> getSongTitles() {
 		List<String> songTitles = new ArrayList<>();
@@ -72,34 +115,60 @@ public class LibraryModel {
 		return songTitles;
 	}
 	
-	public List<String> getArtists() {
-		return Collections.unmodifiableList(artists);
-	}
+	public Set<String> getArtists() {
+        return Collections.unmodifiableSet(artists);
+    }
 	
 	public List<Album> getAlbums() {
-		return Collections.unmodifiableList(albums);
-	}
+        return Collections.unmodifiableList(albums);
+    }
 	
 	public List<PlayList> getPlayLists() {
-		return Collections.unmodifiableList(playlists);
-	}
+        return Collections.unmodifiableList(playlists);
+    }
 	
 	public List<Song> getFavoriteSongs() {
-		return Collections.unmodifiableList(favoriteSongs);
-	}
+        return Collections.unmodifiableList(favoriteSongs);
+    }
 	
-	public boolean rateSong(Song song, int rate) {
-		if (rate >= 6 || rate <= -1) return false;
-		if (!songs.contains(song)) return false;
-		ratedSongs.put(song, rate);
-		if (rate == 5) favoriteSongs.add(song);
-		return true;
-	}
+	/**
+     * Rates the song 1-5. If 5, adds to favorites
+     */
+    public boolean rateSong(Song song, int rate) {
+        if (rate < 1 || rate > 5) {
+            return false;
+        }
+        if (!songs.contains(song)) {
+            return false;
+        }
+        ratedSongs.put(song, rate);
+
+        if (rate == 5 && !favoriteSongs.contains(song)) {
+            favoriteSongs.add(song);
+        } else if (favoriteSongs.contains(song)) {
+            favoriteSongs.remove(song);	// remove song from favorites if rating < 5
+        }
+
+        return true;
+    }
+    
+    /**
+     * Marks a given song as favorite
+     */
+    public boolean markSongAsFavorite(Song song) {
+        if (!songs.contains(song)) {
+            return false;
+        }
+        if (!favoriteSongs.contains(song)) {
+            favoriteSongs.add(song);
+        }
+        return true;
+    }
 	
-	public void createPlayList(String name) {
-		PlayList playlist = new PlayList(name);
-		playlists.add(playlist);
-	}
+    public void createPlayList(String name) {
+        PlayList playlist = new PlayList(name);
+        playlists.add(playlist);
+    }
 	
 	public PlayList getPlayList(String name) {
 		for (PlayList playlist : playlists) {
