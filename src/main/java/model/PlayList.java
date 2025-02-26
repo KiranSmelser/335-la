@@ -26,6 +26,6 @@ public class PlayList {
 	}
 	
     public List<Song> getSongs() {
-        return Collections.unmodifiableList(songs);
+    	return new ArrayList<>(songs);	// copies ArrayList to prevent escaping reference
     }
 }
