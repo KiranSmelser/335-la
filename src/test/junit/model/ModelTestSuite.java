@@ -7,7 +7,7 @@ import org.junit.platform.suite.api.Suite;
  * JUnit Test Suite for the model package
  */
 @Suite
-@SelectClasses({ AlbumTest.class, MusicStoreTest.class, PlayListTest.class, SongTest.class })
+@SelectClasses({ AlbumTest.class, MusicStoreTest.class, PlayListTest.class, SongTest.class, LibraryModelTest.class })
 public class ModelTestSuite {
 
 }

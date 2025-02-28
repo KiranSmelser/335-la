@@ -60,14 +60,8 @@ public class MusicStore {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             // First line
             String heading = br.readLine();
-            if (heading == null) {
-                return;	// probably should throw an exception here
-            }
-
             String[] parts = heading.split(",");
-            if (parts.length < 4) {
-                return; // probably should throw an exception here
-            }
+
             String albumTitle = parts[0].trim();
             String artist = parts[1].trim();
             String genre = parts[2].trim();
@@ -84,11 +78,11 @@ public class MusicStore {
 
                     // Store in songsByTitle
                     String lowerSongTitle = songTitle.toLowerCase();
-                    songsByTitle.computeIfAbsent(lowerSongTitle, k -> new ArrayList<>()).add(song);
+                    songsByTitle.computeIfAbsent(lowerSongTitle, _ -> new ArrayList<>()).add(song);
 
                     // Store in songsByArtist
                     String lowerArtist = artist.toLowerCase();
-                    songsByArtist.computeIfAbsent(lowerArtist, k -> new ArrayList<>()).add(song);
+                    songsByArtist.computeIfAbsent(lowerArtist, _ -> new ArrayList<>()).add(song);
                 }
             }
 
@@ -100,7 +94,7 @@ public class MusicStore {
 
             // Store in albumsByArtist
             String lowerArtist = artist.toLowerCase();
-            albumsByArtist.computeIfAbsent(lowerArtist, k -> new ArrayList<>()).add(album);
+            albumsByArtist.computeIfAbsent(lowerArtist, _ -> new ArrayList<>()).add(album);
         }
     }
 
