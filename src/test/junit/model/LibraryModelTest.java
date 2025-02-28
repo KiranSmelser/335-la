@@ -1,4 +1,4 @@
-package model;
+package musicstore;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -43,6 +43,12 @@ class LibraryModelTest {
         assertEquals(2, library.getSongTitles().size()); // song1 and song2 from album, plus song1 added separately
         assertTrue(library.getArtists().contains("Norah Jones"));
         assertTrue(library.getArtists().contains("Adele"));
+        
+    }
+    
+    @Test
+    void testGetSong() {
+    	assertEquals(2, library.getSongs().size());
     }
 
     @Test
@@ -125,6 +131,13 @@ class LibraryModelTest {
         playlist.removeSong(song1);
         assertEquals(1, playlist.getSongs().size());
         assertEquals(song2, playlist.getSongs().get(0));
+    }
+    
+    @Test
+    void testmarkSongAsFavorite() { 
+    	assertFalse(library.markSongAsFavorite(song3));
+    	assertTrue(library.markSongAsFavorite(song1));
+    	
     }
 
 }
