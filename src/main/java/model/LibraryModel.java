@@ -131,6 +131,10 @@ public class LibraryModel {
         return Collections.unmodifiableList(favoriteSongs);
     }
 	
+	public Map<Song, Integer> getAllRatedSongs() {
+	    return new HashMap<>(ratedSongs);
+	}
+	
 	/**
      * Rates the song 1-5. If 5, adds to favorites
      */
