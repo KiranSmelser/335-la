@@ -16,6 +16,8 @@ public class LibraryModel {
 	private final List<Song> favoriteSongs;
 	private final List<PlayList> playlists;
 	private final Map<Song, Integer> ratedSongs;
+	private final PlayList recentlyPlayedSongs;
+	private final PlayList frequentlyPlayedSongs;
 
 	public LibraryModel() {
 		songs = new ArrayList<>();
@@ -24,6 +26,8 @@ public class LibraryModel {
 		favoriteSongs = new ArrayList<>();
 		playlists = new ArrayList<>();
 		ratedSongs = new HashMap<>();
+		recentlyPlayedSongs = new PlayList("Most Recently Played Songs");
+		frequentlyPlayedSongs = new PlayList("Most Frequently Played Songs");
 	}
 	
 	/**
@@ -131,6 +135,10 @@ public class LibraryModel {
         return Collections.unmodifiableList(favoriteSongs);
     }
 	
+	public Map<Song, Integer> getAllRatedSongs() {
+	    return new HashMap<>(ratedSongs);
+	}
+	
 	/**
      * Rates the song 1-5. If 5, adds to favorites
      */
@@ -175,6 +183,16 @@ public class LibraryModel {
 			if (name.equals(playlist.getName())) return playlist;
 		}
 		return null;
+	}
+	
+	public void playSong(String title, String artist) {
+		for (Song s : songs) {
+			if ((s.getTitle()).equals(title) && (s.getArtist()).equals(artist)) {
+				s.play();
+				recentlyPlayedSongs.addSongRecent(s);
+				frequentlyPlayedSongs.addSongFrequent(s);
+			}
+		}
 	}
 	
 }
