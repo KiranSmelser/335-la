@@ -17,19 +17,11 @@ import java.util.Scanner;
  */
 public class Main {
     public static void main(String[] args) {
-        URL albumsTxtUrl = Main.class.getClassLoader().getResource("albums.txt");
-        URL albumsDirectoryUrl = Main.class.getClassLoader().getResource("albums");
-
-        if (albumsTxtUrl == null || albumsDirectoryUrl == null) {
-            System.err.println("Error: albums.txt or albums folder not found.");
-            return;
-        }
+        String albumsPath = "./src/main/resources/albums.txt";
+        String albumsDirectory = "./src/main/resources/albums";
 
         try {
-            Path albumsTxtPath = Paths.get(albumsTxtUrl.toURI());
-            Path albumsDirectoryPath = Paths.get(albumsDirectoryUrl.toURI());
-
-            MusicStore store = new MusicStore(albumsTxtPath.toString(), albumsDirectoryPath.toString());
+            MusicStore store = new MusicStore(albumsPath, albumsDirectory);
 
             String userJsonPath = "/src/main/resources/users.json";
             UserManager userManager = new UserManager(userJsonPath, store);
@@ -104,7 +96,7 @@ public class Main {
                 }
             }
 
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException e) {
             System.err.println("Error loading album files or user data: " + e.getMessage());
         }
     }
