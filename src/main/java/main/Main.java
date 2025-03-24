@@ -23,7 +23,7 @@ public class Main {
         try {
             MusicStore store = new MusicStore(albumsPath, albumsDirectory);
 
-            String userJsonPath = "/src/main/resources/users.json";
+            String userJsonPath = "data/users.json";
             UserManager userManager = new UserManager(userJsonPath, store);
 
             LibraryModel library;
