@@ -7,6 +7,7 @@ public class Song {
 	private final String title;
     private final String artist;
     private final String albumTitle;
+    private int playCount;
 
     /**
      * @pre title != null && artist != null && albumTitle != null
@@ -15,6 +16,7 @@ public class Song {
         this.title = title;
         this.artist = artist;
         this.albumTitle = albumTitle;
+        this.playCount = 0;
     }
 
     public String getTitle() {
@@ -27,5 +29,13 @@ public class Song {
 
     public String getAlbumTitle() {
         return albumTitle;
+    }
+    
+    public void play() {
+    	playCount ++;
+    }
+    
+    public int getPlayCount() {
+    	return playCount;
     }
 }

@@ -16,6 +16,8 @@ public class LibraryModel {
 	private final List<Song> favoriteSongs;
 	private final List<PlayList> playlists;
 	private final Map<Song, Integer> ratedSongs;
+	private final PlayList recentlyPlayedSongs;
+	private final PlayList frequentlyPlayedSongs;
 
 	public LibraryModel() {
 		songs = new ArrayList<>();
@@ -24,6 +26,8 @@ public class LibraryModel {
 		favoriteSongs = new ArrayList<>();
 		playlists = new ArrayList<>();
 		ratedSongs = new HashMap<>();
+		recentlyPlayedSongs = new PlayList("Most Recently Played Songs");
+		frequentlyPlayedSongs = new PlayList("Most Frequently Played Songs");
 	}
 	
 	/**
@@ -181,4 +185,112 @@ public class LibraryModel {
 		return null;
 	}
 	
+    /**
+     * Implement functionality to simulate the user playing a song
+     */
+	public void playSong(String title, String artist) {
+		for (Song s : songs) {
+			if ((s.getTitle()).equals(title) && (s.getArtist()).equals(artist)) {
+				s.play();
+				recentlyPlayedSongs.addSongRecent(s);
+				frequentlyPlayedSongs.addSongFrequent(s);
+			}
+		}
+	}
+	
+	
+	public List<Song> getSongsSortedByTitle() {
+		return getSortedList("title");
+	}
+	
+	public List<Song> getSongsSortedByArtist() {
+		return getSortedList("artist");
+	}
+	
+	/*
+	 * helper method for getting lists sorted by song title and artist
+	 * */
+	private List<Song> getSortedList(String command) {
+		Map<Song, String> tempMap = new HashMap<>();
+		List<Song> result = new ArrayList<>();
+		for (Song s : songs) {
+			if (command.equals("title")) tempMap.put(s, s.getTitle());
+			else tempMap.put(s, s.getArtist());
+		}
+		// creates a list of entries of tempMap
+		List<Map.Entry<Song, String>> entryList = new ArrayList<>(tempMap.entrySet());
+		// sort by value (title/artist name)
+		entryList.sort(Map.Entry.comparingByValue());
+		for (Map.Entry<Song, String> e : entryList) {
+			result.add(e.getKey());
+		}
+		return result;
+	}
+
+	/*
+	 * returns a list of songs that is sorted by ratings
+	 * */
+	public List<Song> getSongsSortedByRating() {
+		List<Song> result = new ArrayList<>();
+		List<Map.Entry<Song, Integer>> entryList = new ArrayList<>(ratedSongs.entrySet());
+		entryList.sort(Map.Entry.comparingByValue());
+		for (Map.Entry<Song, Integer> e : entryList) {
+			result.add(e.getKey());
+		}
+		return result;
+	}
+	
+	/*
+	 * helper method for identifying if there are multiple name of the given artist
+	 * */
+	private boolean ifDuplicate(String artist) {
+		int temp = 0;
+		for (Song s: songs) {
+			if (s.getArtist().equals(artist)) temp++;
+		}
+		if (temp == 1) return false;
+		return true;
+	}
+	
+	/*
+	 * removes a song from the library
+	 * */
+	public void removeSong(Song song) {
+			songs.remove(song);
+			favoriteSongs.remove(song);
+			for (PlayList p: playlists) {
+				p.removeSong(song);
+			}
+			recentlyPlayedSongs.removeSong(song);
+			frequentlyPlayedSongs.removeSong(song);
+			// if there is only one instance of an artist name of the given song, remove the name from 
+			// the artists list
+			if (!ifDuplicate(song.getArtist())) artists.remove(song.getArtist());
+	}
+	
+	/*
+	 * removes an album from the library
+	 * */
+	public void removeAlbum(Album album) {
+		albums.remove(album);
+		for (Song s : album.getSongs()) {
+			removeSong(s);
+		}
+	}
+	
+	/*
+	 * returns a shuffled list of songs
+	 * */
+	public List<Song> getShuffledSongs() {
+		List<Song> shuffledSongs = new ArrayList<>(songs);
+		Collections.shuffle(shuffledSongs);
+		return shuffledSongs;
+	}
+	
+	/*
+	 * returns a shuffled list of songs in the given play list
+	 * */
+	public List<Song> shuffleSongsInPlayList(PlayList playlist) {
+		return playlist.getShuffledSongs();
+	}
 }
