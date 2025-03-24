@@ -53,6 +53,7 @@ public class Main {
                             System.out.println("Login failed. Check your credentials and try again.");
                         } else {
                             library = new LibraryModel();
+                            library.setMusicStore(store);
                             userManager.loadUserLibrary(library);
 
                             View view = new View(library, store, userManager);
