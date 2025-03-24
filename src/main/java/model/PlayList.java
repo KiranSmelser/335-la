@@ -29,6 +29,8 @@ public class PlayList {
 	
 	public void removeSong(Song song) {
 		songs.remove(song);
+		recent.remove(song);
+		frequent.remove(song);
 	}
 	
     public List<Song> getSongs() {
@@ -67,5 +69,11 @@ public class PlayList {
 
         return sortedSongs;
     }
+    
+	public List<Song> getShuffledSongs() {
+		List<Song> shuffledSongs = new ArrayList<>(songs);
+		Collections.shuffle(shuffledSongs);
+		return shuffledSongs;
+	}
     
 }
