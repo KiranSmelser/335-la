@@ -18,42 +18,213 @@ public class LibraryModel {
 	private final Map<Song, Integer> ratedSongs;
 	private final PlayList recentlyPlayedSongs;
 	private final PlayList frequentlyPlayedSongs;
+	private MusicStore store;
+    private PlayList favoritesAutoPlaylist;
+    private PlayList topRatedAutoPlaylist;
+    private final Map<String, PlayList> genrePlaylists;
 
-	public LibraryModel() {
-		songs = new ArrayList<>();
-		artists = new HashSet<>();
-		albums = new ArrayList<>();
-		favoriteSongs = new ArrayList<>();
-		playlists = new ArrayList<>();
-		ratedSongs = new HashMap<>();
-		recentlyPlayedSongs = new PlayList("Most Recently Played Songs");
-		frequentlyPlayedSongs = new PlayList("Most Frequently Played Songs");
-	}
+    public LibraryModel() {
+        songs = new ArrayList<>();
+        artists = new HashSet<>();
+        albums = new ArrayList<>();
+        favoriteSongs = new ArrayList<>();
+        playlists = new ArrayList<>();
+        ratedSongs = new HashMap<>();
+        recentlyPlayedSongs = new PlayList("Most Recently Played Songs");
+        frequentlyPlayedSongs = new PlayList("Most Frequently Played Songs");
+        genrePlaylists = new HashMap<>();
+    }
+    
+    /**
+     * Allows LibraryModel to query MusicStore
+     */
+    public void setMusicStore(MusicStore store) {
+        this.store = store;
+    }
+    
+    public MusicStore getMusicStore() {
+        return this.store;
+    }
 	
 	/**
      * Adds a song to library if not already present
      */
-	public void addSong(Song song) {
-		if (!songs.contains(song)) {
+    public void addSong(Song song) {
+        if (!songs.contains(song)) {
             songs.add(song);
             artists.add(song.getArtist());
         }
-	}
-	
-	/**
-     * Adds an album and all its songs to library if not already present
-     */
-	public void addAlbum(Album album) {
-		if (!albums.contains(album)) {
-            albums.add(album);
-        }
-        for (Song song : album.getSongs()) {
-            if (!songs.contains(song)) {
-                songs.add(song);
-                artists.add(song.getArtist());
+        Album libraryAlbum = findAlbumInLibrary(song.getAlbumTitle(), song.getArtist());
+        if (libraryAlbum == null) {
+            String genre = "Unknown";
+            int year = 0;
+            if (store != null) {
+                Album storeAlbum = store.getAlbumByTitle(song.getAlbumTitle());
+                if (storeAlbum != null && 
+                    storeAlbum.getArtist().equalsIgnoreCase(song.getArtist())) {
+                    genre = storeAlbum.getGenre();
+                    year = storeAlbum.getYear();
+                }
+            }
+            List<Song> partialSongs = new ArrayList<>();
+            partialSongs.add(song);
+            Album partialAlbum = new Album(song.getAlbumTitle(), song.getArtist(), genre, year, partialSongs);
+            albums.add(partialAlbum);
+        } else {
+            List<Song> currentTracks = libraryAlbum.getSongs();
+            if (!currentTracks.contains(song)) {
+                albums.remove(libraryAlbum);
+                List<Song> updatedSongs = new ArrayList<>(currentTracks);
+                updatedSongs.add(song);
+                Album updatedAlbum = new Album(
+                    libraryAlbum.getTitle(),
+                    libraryAlbum.getArtist(),
+                    libraryAlbum.getGenre(),
+                    libraryAlbum.getYear(),
+                    updatedSongs
+                );
+                albums.add(updatedAlbum);
             }
         }
-	}
+    }
+    
+    /**
+     * Adds an album and all its songs to library if not already present
+     */
+    public void addAlbum(Album album) {
+        Album existingAlbum = findAlbumInLibrary(album.getTitle(), album.getArtist());
+        if (existingAlbum != null) {
+            albums.remove(existingAlbum);
+
+            List<Song> mergedSongs = new ArrayList<>(existingAlbum.getSongs());
+            for (Song s : album.getSongs()) {
+                if (!mergedSongs.contains(s)) {
+                    mergedSongs.add(s);
+                }
+            }
+
+            Album mergedAlbum = new Album(
+                existingAlbum.getTitle(),
+                existingAlbum.getArtist(),
+                existingAlbum.getGenre(),
+                existingAlbum.getYear(),
+                mergedSongs
+            );
+
+            albums.add(mergedAlbum);
+
+            for (Song s : mergedSongs) {
+                if (!songs.contains(s)) {
+                    songs.add(s);
+                    artists.add(s.getArtist());
+                }
+            }
+        }
+        else {
+            if (!albums.contains(album)) {
+                albums.add(album);
+            }
+            for (Song s : album.getSongs()) {
+                if (!songs.contains(s)) {
+                    songs.add(s);
+                    artists.add(s.getArtist());
+                }
+            }
+        }
+    }
+    
+    /**
+     * Given title, artist returns album info
+     */
+    public Album getAlbumInfoForSong(String title, String artist) {
+        List<Song> storeSongs = store.getSongsByTitle(title);
+        for (Song s : storeSongs) {
+            if (s.getArtist().equalsIgnoreCase(artist)) {
+                Album storeAlb = store.getAlbumByTitle(s.getAlbumTitle());
+                return storeAlb; 
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Checks if album is in library
+     */
+    public boolean isAlbumInLibrary(String albumTitle, String artist) {
+        return (findAlbumInLibrary(albumTitle, artist) != null);
+    }
+    
+    /**
+     * Returns all songs in library that match genre
+     */
+    public List<Song> getSongsByGenre(String genre) {
+        List<Song> result = new ArrayList<>();
+        for (Album alb : albums) {
+            if (alb.getGenre().equalsIgnoreCase(genre)) {
+                result.addAll(alb.getSongs());
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Rebuilds auto-playlists
+     */
+    public void updateAutoPlaylists() {
+        favoritesAutoPlaylist = new PlayList("Favorite Songs (Auto)");
+        for (Song s : favoriteSongs) {
+            favoritesAutoPlaylist.addSong(s);
+        }
+
+        topRatedAutoPlaylist = new PlayList("Top Rated (Auto)");
+        for (Map.Entry<Song, Integer> e : ratedSongs.entrySet()) {
+            if (e.getValue() >= 4) {
+                topRatedAutoPlaylist.addSong(e.getKey());
+            }
+        }
+
+        genrePlaylists.clear();
+        Map<String, List<Song>> genreToSongs = new HashMap<>();
+
+        for (Album alb : albums) {
+            String g = alb.getGenre();
+            List<Song> albumTracks = alb.getSongs();
+            genreToSongs.computeIfAbsent(g, k -> new ArrayList<>()).addAll(albumTracks);
+        }
+
+        for (Map.Entry<String, List<Song>> ent : genreToSongs.entrySet()) {
+            String genre = ent.getKey();
+            List<Song> allSongs = ent.getValue();
+            if (allSongs.size() >= 10) {
+                PlayList gp = new PlayList(genre + " (Auto)");
+                for (Song s : allSongs) {
+                    gp.addSong(s);
+                }
+                genrePlaylists.put(genre.toLowerCase(), gp);
+            }
+        }
+    }
+
+    public PlayList getFavoritesAutoPlaylist() {
+        return favoritesAutoPlaylist;
+    }
+
+    public PlayList getTopRatedAutoPlaylist() {
+        return topRatedAutoPlaylist;
+    }
+
+    public PlayList getGenreAutoPlaylist(String genre) {
+        return genrePlaylists.get(genre.toLowerCase());
+    }
+
+    private Album findAlbumInLibrary(String title, String artist) {
+        for (Album a : albums) {
+            if (a.getTitle().equalsIgnoreCase(title) && a.getArtist().equalsIgnoreCase(artist)) {
+                return a;
+            }
+        }
+        return null;
+    }
 
 	/**
      * Returns all Songs that match a given title

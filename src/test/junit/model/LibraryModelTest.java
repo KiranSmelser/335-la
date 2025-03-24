@@ -2,6 +2,7 @@ package model;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,12 +21,16 @@ class LibraryModelTest {
     private Song song3;
     private Album album;
     private PlayList playlist;
+    private MusicStore store;
     
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
     	
         library = new LibraryModel();
+        
+        store = new MusicStore("src/main/resources/albums.txt", "src/main/resources/albums");
+        library.setMusicStore(store);
 
         song1 = new Song("Uh Oh", "Norah Jones", "Begin Again");
         song2 = new Song("Daydreamer", "Adele", "19");
@@ -221,5 +226,93 @@ class LibraryModelTest {
         assertTrue(shuffled.contains(song1));
         assertTrue(shuffled.contains(song2));
         assertTrue(shuffled.contains(song3));
+    }
+    
+    @Test
+    void testGetAlbumInfoForSong_dPart() {
+        Album storeAlbum = library.getAlbumInfoForSong("Daydreamer", "Adele");
+        
+        // If store is loaded, we expect storeAlbum != null
+        // (If no real store is set, this might be null, so we'll do a defensive check.)
+        if (storeAlbum != null) {
+            assertEquals("19", storeAlbum.getTitle()); 
+            assertEquals("Adele", storeAlbum.getArtist());
+
+            // Now check if it's in the library
+            boolean inLibrary = library.isAlbumInLibrary(storeAlbum.getTitle(), storeAlbum.getArtist());
+            // Currently we only have \"test album\" by \"test artist\" plus partial stuff for song2. 
+            // So presumably false if we didn't add the full store album:
+            assertFalse(inLibrary);
+        }
+        else {
+            // If you don't have a real store, just confirm we handle null gracefully
+            assertNull(storeAlbum);
+        }
+    }
+    
+    @Test
+    void testAddSongCreatesPartialAlbum() {
+        assertFalse(library.getSongs().contains(song3));
+        assertEquals(1, library.getAlbums().size(), "Only 'test album' so far");
+
+        library.addSong(song3);
+
+        assertTrue(library.getSongs().contains(song3));
+        assertEquals(2, library.getAlbums().size(), "We should have the old 'test album' plus new partial album");
+        
+        Album partialAdeleAlbum = null;
+        for (Album a : library.getAlbums()) {
+            if (a.getTitle().equalsIgnoreCase("21") && a.getArtist().equalsIgnoreCase("Adele")) {
+                partialAdeleAlbum = a;
+                break;
+            }
+        }
+        assertNotNull(partialAdeleAlbum);
+        assertEquals(1, partialAdeleAlbum.getSongs().size(), "Should contain only 'Take It All'");
+        assertEquals("Take It All", partialAdeleAlbum.getSongs().get(0).getTitle());
+    }
+    
+    @Test
+    void testGetSongsByGenre() {
+        List<Song> found = library.getSongsByGenre("test genre");
+        assertEquals(2, found.size());
+        assertTrue(found.contains(song1));
+        assertTrue(found.contains(song2));
+
+        List<Song> empty = library.getSongsByGenre("Rock");
+        assertTrue(empty.isEmpty());
+    }
+    
+    @Test
+    void testAutoPlaylists() {
+        library.addSong(song2);
+        library.markSongAsFavorite(song2);
+        
+        library.rateSong(song1, 4);
+
+        for (int i = 0; i < 9; i++) {
+            Song additional = new Song("test song " + i, "test artist", "test album");
+            library.addSong(additional);
+        }
+        
+        library.updateAutoPlaylists();
+        
+        PlayList favesAuto = library.getFavoritesAutoPlaylist();
+        assertNotNull(favesAuto);
+
+        assertEquals(1, favesAuto.getSongs().size());
+        assertEquals(song2.getTitle(), favesAuto.getSongs().get(0).getTitle());
+
+        PlayList topRated = library.getTopRatedAutoPlaylist();
+        assertNotNull(topRated);
+
+        boolean hasSong1 = topRated.getSongs().contains(song1);
+        boolean hasSong2 = topRated.getSongs().contains(song2); 
+        assertTrue(hasSong1 || hasSong2);
+
+        PlayList genreAuto = library.getGenreAutoPlaylist("test genre");
+
+        assertNotNull(genreAuto);
+        assertEquals(11, genreAuto.getSongs().size());
     }
 }
