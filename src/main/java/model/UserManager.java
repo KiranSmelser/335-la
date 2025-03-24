@@ -173,6 +173,46 @@ public class UserManager {
                 }
             }
         }
+        
+     // 5) Load 'recentlyPlayedSongs'
+        JSONArray recentArr = json.optJSONArray("recentlyPlayedSongs");
+        if (recentArr != null) {
+            for (int i = 0; i < recentArr.length(); i++) {
+                JSONObject sObj = recentArr.getJSONObject(i);
+                String title = sObj.getString("title");
+                String artist = sObj.getString("artist");
+                String albumTitle = sObj.getString("albumTitle");
+
+                List<Song> matches = library.getSongsByTitle(title);
+                for (Song s : matches) {
+                    if (s.getArtist().equalsIgnoreCase(artist)
+                            && s.getAlbumTitle().equalsIgnoreCase(albumTitle)) {
+                        library.getRecentlyPlayedPlayList().addSongRecent(s);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 6) Load 'frequentlyPlayedSongs'
+        JSONArray freqArr = json.optJSONArray("frequentlyPlayedSongs");
+        if (freqArr != null) {
+            for (int i = 0; i < freqArr.length(); i++) {
+                JSONObject sObj = freqArr.getJSONObject(i);
+                String title = sObj.getString("title");
+                String artist = sObj.getString("artist");
+                String albumTitle = sObj.getString("albumTitle");
+
+                List<Song> matches = library.getSongsByTitle(title);
+                for (Song s : matches) {
+                    if (s.getArtist().equalsIgnoreCase(artist)
+                            && s.getAlbumTitle().equalsIgnoreCase(albumTitle)) {
+                        library.getFrequentlyPlayedPlayList().addSongFrequent(s);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -250,6 +290,28 @@ public class UserManager {
             playlistsArr.put(plObj);
         }
         root.put("playlists", playlistsArr);
+        
+     // 5) Save recentlyPlayedSongs
+        JSONArray recentArr = new JSONArray();
+        for (Song s : library.getRecentlyPlayedSongs()) {
+            JSONObject sObj = new JSONObject();
+            sObj.put("title", s.getTitle());
+            sObj.put("artist", s.getArtist());
+            sObj.put("albumTitle", s.getAlbumTitle());
+            recentArr.put(sObj);
+        }
+        root.put("recentlyPlayedSongs", recentArr);
+
+        // 6) Save frequentlyPlayedSongs
+        JSONArray freqArr = new JSONArray();
+        for (Song s : library.getFrequentlyPlayedSongs()) {
+            JSONObject sObj = new JSONObject();
+            sObj.put("title", s.getTitle());
+            sObj.put("artist", s.getArtist());
+            sObj.put("albumTitle", s.getAlbumTitle());
+            freqArr.put(sObj);
+        }
+        root.put("frequentlyPlayedSongs", freqArr);
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(libraryFile))) {
             bw.write(root.toString(2));

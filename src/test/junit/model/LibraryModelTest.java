@@ -29,6 +29,7 @@ class LibraryModelTest {
 
         song1 = new Song("Uh Oh", "Norah Jones", "Begin Again");
         song2 = new Song("Daydreamer", "Adele", "19");
+        song3 = new Song("Take It All", "Adele", "21");
 
         List<Song> albumSongs = new ArrayList<>();
         albumSongs.add(song1);
@@ -139,5 +140,86 @@ class LibraryModelTest {
     	assertTrue(library.markSongAsFavorite(song1));
     	
     }
+    
+    @Test
+    void testRemoveSong() {
+        library.addSong(song2);
+        assertTrue(library.getSongs().contains(song2));
+        library.removeSong(song2);
+        assertFalse(library.getSongs().contains(song2));
+    }
+    
+    @Test
+    void testRemoveAlbum() {
+        assertTrue(library.getAlbums().contains(album));
+        library.removeAlbum(album);
+        assertFalse(library.getAlbums().contains(album));
 
+        assertFalse(library.getSongs().contains(song1));
+        assertFalse(library.getSongs().contains(song2));
+    }
+    
+    @Test
+    void testSorting() {
+        library.addSong(song3);
+
+        // Sort by title
+        List<Song> byTitle = library.getSongsSortedByTitle();
+        assertEquals("Daydreamer", byTitle.get(0).getTitle());
+        assertEquals("Take It All", byTitle.get(1).getTitle());
+        assertEquals("Uh Oh", byTitle.get(2).getTitle());
+
+        // Sort by artist
+        List<Song> byArtist = library.getSongsSortedByArtist();
+        assertEquals("Adele", byArtist.get(0).getArtist());
+        assertEquals("Adele", byArtist.get(1).getArtist());
+        assertEquals("Norah Jones", byArtist.get(2).getArtist());
+
+        library.rateSong(song3, 2);
+        library.rateSong(song2, 5);
+        library.rateSong(song1, 4);
+
+        // Sort by rating ascending
+        List<Song> byRating = library.getSongsSortedByRating();
+        assertEquals(song3, byRating.get(0));
+        assertEquals(song1, byRating.get(1));
+        assertEquals(song2, byRating.get(2));
+    }
+    
+    @Test
+    void testPlaySong() {
+        library.addSong(song3);
+
+        library.playSong("Uh Oh", "Norah Jones");
+
+        List<Song> recent = library.getRecentlyPlayedSongs();
+        assertEquals(1, recent.size());
+        assertEquals("Uh Oh", recent.get(0).getTitle());
+
+        List<Song> frequent = library.getFrequentlyPlayedSongs();
+        assertEquals(1, frequent.size());
+        assertEquals("Uh Oh", frequent.get(0).getTitle());
+
+        library.playSong("Take It All", "Adele");
+        assertEquals(2, library.getRecentlyPlayedSongs().size());
+        assertEquals("Take It All", library.getRecentlyPlayedSongs().get(0).getTitle());
+        assertEquals(2, library.getFrequentlyPlayedSongs().size());
+
+        library.playSong("Uh Oh", "Norah Jones");
+        library.playSong("Uh Oh", "Norah Jones");
+
+        List<Song> freq2 = library.getFrequentlyPlayedSongs();
+        assertEquals("Uh Oh", freq2.get(0).getTitle());
+    }
+    
+    @Test
+    void testShuffle() {
+        library.addSong(song3);
+        List<Song> shuffled = library.getShuffledSongs();
+        assertEquals(3, shuffled.size());
+
+        assertTrue(shuffled.contains(song1));
+        assertTrue(shuffled.contains(song2));
+        assertTrue(shuffled.contains(song3));
+    }
 }

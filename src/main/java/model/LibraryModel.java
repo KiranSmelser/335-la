@@ -185,6 +185,22 @@ public class LibraryModel {
 		return null;
 	}
 	
+	public PlayList getRecentlyPlayedPlayList() {
+	    return this.recentlyPlayedSongs;
+	}
+
+	public PlayList getFrequentlyPlayedPlayList() {
+	    return this.frequentlyPlayedSongs;
+	}
+	
+	public List<Song> getRecentlyPlayedSongs() {
+	    return recentlyPlayedSongs.getRecentlyPlayedSongs();
+	}
+
+	public List<Song> getFrequentlyPlayedSongs() {
+	    return frequentlyPlayedSongs.getFrequentlyPlayedSongs();
+	}
+	
     /**
      * Implement functionality to simulate the user playing a song
      */

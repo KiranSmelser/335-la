@@ -38,4 +38,26 @@ class SongTest {
         assertEquals("Boys & Girls", song.getAlbumTitle());
         assertEquals("Coat of Many Colors", song2.getAlbumTitle());
     }
+    
+    @Test
+    void testPlayCountAndPlayMethod() {
+        assertEquals(0, song.getPlayCount());
+        song.play();
+        song.play();
+        assertEquals(2, song.getPlayCount());
+
+        assertEquals(0, song2.getPlayCount());
+    }
+
+    @Test
+    void testSetPlayCount() {
+        song.setPlayCount(5);
+        assertEquals(5, song.getPlayCount());
+
+        song.setPlayCount(-3);
+        assertEquals(0, song.getPlayCount());
+        
+        song.setPlayCount(0);
+        assertEquals(0, song.getPlayCount());
+    }
 }

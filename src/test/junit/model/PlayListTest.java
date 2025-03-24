@@ -67,4 +67,49 @@ class PlayListTest {
         songs.clear();
         assertEquals(2, playlist.getSongs().size());
     }
+    
+    @Test
+    void testAddSongRecent() {
+        for (int i = 1; i <= 12; i++) {
+            Song s = new Song("Title" + i, "Artist" + i, "Album" + i);
+            playlist.addSongRecent(s);
+        }
+        List<Song> recents = playlist.getRecentlyPlayedSongs();
+        assertEquals(10, recents.size());
+
+        assertEquals("Title12", recents.get(0).getTitle());
+        assertEquals("Title3", recents.get(9).getTitle());
+    }
+    
+    @Test
+    void testAddSongFrequent() {
+        song1.setPlayCount(5);
+        song2.setPlayCount(10);
+
+        playlist.addSongFrequent(song1);
+        playlist.addSongFrequent(song2);
+
+        for (int i = 4; i <= 11; i++) {
+            Song s = new Song("Title" + i, "Artist" + i, "Album" + i);
+            s.setPlayCount(i);
+            playlist.addSongFrequent(s);
+        }
+        List<Song> freq = playlist.getFrequentlyPlayedSongs();
+        assertEquals(10, freq.size());
+
+        assertEquals("Title11", freq.get(0).getTitle()); 
+        assertEquals("Hang Loose", freq.get(1).getTitle());
+    }
+    
+    @Test
+    void testGetShuffledSongs() {
+        playlist.addSong(song1);
+        playlist.addSong(song2);
+
+        List<Song> shuffled = playlist.getShuffledSongs();
+        assertEquals(2, shuffled.size());
+        
+        assertTrue(shuffled.contains(song1));
+        assertTrue(shuffled.contains(song2));
+    }
 }
