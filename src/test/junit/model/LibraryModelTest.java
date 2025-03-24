@@ -229,7 +229,7 @@ class LibraryModelTest {
     }
     
     @Test
-    void testGetAlbumInfoForSong_dPart() {
+    void testGetAlbumInfoForSong() {
         Album storeAlbum = library.getAlbumInfoForSong("Daydreamer", "Adele");
         
         if (storeAlbum != null) {
