@@ -46,7 +46,7 @@ class LibraryModelTest {
     @Test
     void testAddSong() {
     	library.addSong(song1); library.addSong(song2);
-        assertEquals(2, library.getSongTitles().size()); // song1 and song2 from album, plus song1 added separately
+        assertEquals(2, library.getSongTitles().size());
         assertTrue(library.getArtists().contains("Norah Jones"));
         assertTrue(library.getArtists().contains("Adele"));
         
@@ -97,13 +97,13 @@ class LibraryModelTest {
 
     @Test
     void testRateSongInvalidRating() {
-        assertFalse(library.rateSong(song1, 6)); // Invalid rating
-        assertFalse(library.rateSong(song2, -1)); // Invalid rating
+        assertFalse(library.rateSong(song1, 6));
+        assertFalse(library.rateSong(song2, -1));
     }
 
     @Test
     void testRateSongNotInLibrary() {
-        assertFalse(library.rateSong(song3, 3)); // song3 was never added
+        assertFalse(library.rateSong(song3, 3));
     }
 
     @Test
@@ -232,20 +232,15 @@ class LibraryModelTest {
     void testGetAlbumInfoForSong_dPart() {
         Album storeAlbum = library.getAlbumInfoForSong("Daydreamer", "Adele");
         
-        // If store is loaded, we expect storeAlbum != null
-        // (If no real store is set, this might be null, so we'll do a defensive check.)
         if (storeAlbum != null) {
             assertEquals("19", storeAlbum.getTitle()); 
             assertEquals("Adele", storeAlbum.getArtist());
 
-            // Now check if it's in the library
             boolean inLibrary = library.isAlbumInLibrary(storeAlbum.getTitle(), storeAlbum.getArtist());
-            // Currently we only have \"test album\" by \"test artist\" plus partial stuff for song2. 
-            // So presumably false if we didn't add the full store album:
+
             assertFalse(inLibrary);
         }
         else {
-            // If you don't have a real store, just confirm we handle null gracefully
             assertNull(storeAlbum);
         }
     }
