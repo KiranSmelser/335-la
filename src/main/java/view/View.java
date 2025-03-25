@@ -707,6 +707,22 @@ public class View {
                 System.out.println("  - " + s.getTitle() + " by " + s.getArtist());
             }
         }
+        
+        System.out.println("\nAUTO-PLAYLIST: Most Frequently Played (Auto)");
+        PlayList freq = library.getFrequentlyPlayedPlayList();
+        if (freq != null) {
+            for (Song s : freq.getFrequentlyPlayedSongs()) {
+                System.out.println("  - " + s.getTitle() + " by " + s.getArtist() + ": " + s.getPlayCount() + " time(s) played");
+            }
+        }
+        
+        System.out.println("\nAUTO-PLAYLIST: Most Recently Played (Auto)");
+        PlayList rec = library.getRecentlyPlayedPlayList();
+        if (rec != null) {
+            for (Song s : rec.getRecentlyPlayedSongs()) {
+                System.out.println("  - " + s.getTitle() + " by " + s.getArtist());
+            }
+        }
 
         System.out.println("\nAUTO-PLAYLISTS by Genre:");
         Set<String> uniqueGenres = new HashSet<>();
