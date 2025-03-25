@@ -263,4 +263,34 @@ class UserManagerTest {
         assertTrue(bobLoaded.getSongsByTitle("Lullaby").size() >= 1);
         assertTrue(bobLoaded.getSongsByTitle("Rolling in the Deep").isEmpty());
     }
+    
+    @Test
+    void testLoadAndSaveUserLibrary_PlayedSongsArePersisted() throws IOException {
+        userManager.createUser("musicFan", "pass123");
+        assertTrue(userManager.authenticate("musicFan", "pass123"));
+
+        Album storeAlbum = musicStore.getAlbumByTitle("21");
+        assertNotNull(storeAlbum);
+        library.addAlbum(storeAlbum);
+        Song someSong = storeAlbum.getSongs().get(0);
+
+        library.playSong(someSong.getTitle(), someSong.getArtist());
+        library.playSong(someSong.getTitle(), someSong.getArtist());
+
+        userManager.saveUserLibrary(library);
+
+        LibraryModel loaded = new LibraryModel();
+        userManager.loadUserLibrary(loaded);
+
+        List<Song> loadedRecent = loaded.getRecentlyPlayedSongs();
+        assertFalse(loadedRecent.isEmpty());
+
+        assertEquals(someSong.getTitle(), loadedRecent.get(0).getTitle());
+
+        List<Song> loadedFreq = loaded.getFrequentlyPlayedSongs();
+        assertFalse(loadedFreq.isEmpty());
+        assertEquals(someSong.getTitle(), loadedFreq.get(0).getTitle());
+
+        assertFalse(loaded.getSongs().isEmpty());
+    }
 }

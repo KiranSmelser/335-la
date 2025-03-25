@@ -38,4 +38,12 @@ public class Song {
     public int getPlayCount() {
     	return playCount;
     }
+    
+    public void setPlayCount(int count) {
+    	if (count >= 0) {
+    		this.playCount = count;    	
+    	} else {
+    		this.playCount = 0;
+    	}
+    }
 }
